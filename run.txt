@@ -1,0 +1,8 @@
+docker run ^
+--name hyperf ^
+-v ./home:/data/project ^
+-p 9501:9501 -it ^
+--workdir /data/project --rm ^
+--privileged -u root ^
+--entrypoint /bin/sh ^
+hyperf/hyperf:8.3-alpine-v3.19-swoole-slim-v5

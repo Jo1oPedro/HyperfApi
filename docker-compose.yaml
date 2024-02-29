@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+  api01: &api
+    image: hyperf/hyperf:8.3-alpine-v3.19-swoole-slim-v5
+    volumes:
+      - ./:/data/project
+    ports:
+      - '9501:9501'
+    working_dir: /data/project
+    privileged: true
+    user: root
+    tty: true
+    stdin_open: true
+    networks:
+      - cascata
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: banco_de_dados_relacional
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+  api02:
+    <<: *api
+    ports:
+      - '10000:9501'
+    networks:
+      - cascata
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/access.log:/var/log/nginx/access.log
+    depends_on:
+      - api01
+      - api02
+    ports:
+      - "8888:8888"
+    networks:
+      - cascata
+  banco_de_dados_em_memoria:
+    image: memcached:1.6.21
+    ports:
+      - '10211:11211'
+    command: -m 64
+    networks:
+      - cascata
+  banco_de_dados_relacional:
+    #image: mysql:5.7
+    image: mysql:latest
+    expose:
+      - "3306"
+    ports:
+      - '5306:3306'
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    volumes:
+      - ./docker/backup_banco_de_dados_relacional/database:/var/lib/mysql
+    networks:
+      - cascata
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      restart: always
+      expose:
+        - "80"
+      ports:
+        - "8003:80"
+      volumes:
+        - ./docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+      environment:
+        #PMA_ARBITRARY: 1
+        PMA_HOST: banco_de_dados_relacional
+      depends_on:
+        - banco_de_dados_relacional
+      networks:
+        - cascata
+  mensageria:
+    image: rabbitmq:management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - cascata
+networks:
+  cascata:
