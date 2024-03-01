@@ -22,9 +22,8 @@ class LoginRepository implements LoginRepositoryInterface
 
     public function login(array $request)
     {
-        var_dump($request);
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $email = $request['email'];
+        $password = $request['password'];
 
         $user = $this->getUserByEmail($email);
 
@@ -57,12 +56,12 @@ class LoginRepository implements LoginRepositoryInterface
         var_dump($request);
         $user = User::create([
             'uuid' => Uuid::uuid4()->toString(),
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'birth_date' => $request->input('birth_date'),
-            'document' => $request->input('document'),
-            'cellphone' => $request->input('cellphone'),
-            'password' => password_hash($request->input('password'), PASSWORD_BCRYPT),
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'birth_date' => $request['birth_date'],
+            'document' => $request['document'],
+            'cellphone' => $request['cellphone'],
+            'password' => password_hash($request['password'], PASSWORD_BCRYPT),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
