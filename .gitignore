@@ -3,3 +3,4 @@ docker/nginx/access.log
 docker/phpmyadmin
 hyperf-skeleton/vendor
 .env
+.idea
