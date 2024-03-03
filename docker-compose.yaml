@@ -7,7 +7,7 @@ services:
       - ./:/data/project
     ports:
       - '9501:9501'
-    working_dir: /data/project
+    working_dir: /data/project/hyperf-skeleton
     privileged: true
     user: root
     tty: true
@@ -21,6 +21,7 @@ services:
       DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
   api02:
     <<: *api
     ports:
@@ -88,6 +89,10 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - cascata
+  redis:
+    image: redis:latest
     networks:
       - cascata
 networks:
