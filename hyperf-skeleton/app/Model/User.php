@@ -13,12 +13,13 @@ class User extends Model
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'User';
+    protected ?string $table = 'users';
 
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = [];
+    #protected array $fillable = [];
+    protected array $guarded = [];
 
     /**
      * The attributes that should be cast to native types.
